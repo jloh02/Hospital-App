@@ -1,0 +1,99 @@
+{
+  "project_info": {
+    "project_number": "206709859844",
+    "firebase_url": "https://hospitalapp-5364d.firebaseio.com",
+    "project_id": "hospitalapp-5364d",
+    "storage_bucket": "hospitalapp-5364d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:206709859844:android:d71b6903a22b9f13",
+        "android_client_info": {
+          "package_name": "com.example.jonathan.hospitalapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "206709859844-vm15mnl7oiim8inmnfg88momeehcgl5t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.jonathan.hospitalapp",
+            "certificate_hash": "f6bf06197c560d23b753547e8a0bd0d5fd0c34bc"
+          }
+        },
+        {
+          "client_id": "206709859844-m4tcrt3kptrcps3l7vp7tch7gqfg8jch.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAnIp5Zt-Vg7wp9ZLyMUBjOFY1mFdMSqG0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "206709859844-m4tcrt3kptrcps3l7vp7tch7gqfg8jch.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:206709859844:android:e6a41fd48fa63a0d",
+        "android_client_info": {
+          "package_name": "com.example.jonathan.hospitalapp2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "206709859844-jokb1sf2v84doq8tvkgh0g26dl0ev45l.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.jonathan.hospitalapp2",
+            "certificate_hash": "f6bf06197c560d23b753547e8a0bd0d5fd0c34bc"
+          }
+        },
+        {
+          "client_id": "206709859844-m4tcrt3kptrcps3l7vp7tch7gqfg8jch.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAnIp5Zt-Vg7wp9ZLyMUBjOFY1mFdMSqG0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "206709859844-m4tcrt3kptrcps3l7vp7tch7gqfg8jch.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

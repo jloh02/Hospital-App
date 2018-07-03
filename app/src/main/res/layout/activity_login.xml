@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.example.jonathan.hospitalapp2.loginActivity"
+    android:theme="@style/AppTheme.NoActionBar">
+
+    <TextView
+        android:id="@+id/instruction"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@+id/eT"
+        android:layout_marginBottom="20dp"
+        android:gravity="center"
+        android:text="Sign In to\nHospital Helper"
+        android:textSize="30dp" />
+
+    <TextView
+        android:id="@+id/eT"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/em"
+        android:layout_centerHorizontal="true"
+        android:text="Email"
+        android:textSize="20dp" />
+
+    <AutoCompleteTextView
+        android:id="@+id/em"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:imeOptions="actionNext"
+        android:inputType="textWebEmailAddress"
+        android:textSize="15dp">
+    <requestFocus />
+    </AutoCompleteTextView>
+
+    <!--EditText
+        android:id="@+id/em"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:imeOptions="actionNext"
+        android:inputType="textWebEmailAddress"
+        android:textSize="15dp" /-->
+
+    <TextView
+        android:id="@+id/pT"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/em"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="0dp"
+        android:text="Password"
+        android:textSize="20dp" />
+
+    <EditText
+        android:id="@+id/pw"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/pT"
+        android:layout_centerHorizontal="true"
+        android:imeOptions="actionDone"
+        android:inputType="textPassword"
+        android:textSize="15dp" />
+
+    <Button
+        android:id="@+id/sign_in"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/pw"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dp"
+        android:onClick="signIn"
+        android:text="Sign In" />
+
+
+</RelativeLayout>

@@ -165,54 +165,15 @@
             android:layout_alignParentRight="true">
 
             <EditText
-                android:id="@+id/year"
-                android:layout_width="50dp"
+                android:id="@+id/timeChosen"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:imeOptions="actionNext"
                 android:inputType="number"
-                android:hint="Year"
-                android:textSize="15dp" />
-
-            <EditText
-                android:id="@+id/month"
-                android:layout_width="50dp"
-                android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/year"
-                android:imeOptions="actionNext"
-                android:inputType="number"
-                android:hint="Month"
-                android:textSize="15dp" />
-
-            <EditText
-                android:id="@+id/day"
-                android:layout_width="50dp"
-                android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/month"
-                android:imeOptions="actionNext"
-                android:inputType="number"
-                android:hint="Day"
-                android:textSize="15dp" />
-
-            <EditText
-                android:id="@+id/hour"
-                android:layout_width="50dp"
-                android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/day"
-                android:imeOptions="actionNext"
-                android:inputType="number"
-                android:hint="Hour"
-                android:textSize="15dp" />
-
-            <EditText
-                android:id="@+id/minute"
-                android:layout_width="50dp"
-                android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/hour"
-                android:imeOptions="actionNext"
-                android:inputType="number"
-                android:hint="Min"
-                android:textSize="15dp" />
+                android:hint="Select Appointment Time"
+                android:textSize="15dp"
+                android:focusable="false"/>
 
         </RelativeLayout>
     </RelativeLayout>

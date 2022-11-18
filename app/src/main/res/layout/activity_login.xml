@@ -16,7 +16,7 @@
         android:layout_above="@+id/eT"
         android:layout_marginBottom="20dp"
         android:gravity="center"
-        android:text="Sign In to\nHospital Helper"
+        android:text="Sign In to\nHospital Appointment\nScheduler"
         android:textSize="30dp" />
 
     <TextView
@@ -40,16 +40,6 @@
     <requestFocus />
     </AutoCompleteTextView>
 
-    <!--EditText
-        android:id="@+id/em"
-        android:layout_width="250dp"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:imeOptions="actionNext"
-        android:inputType="textWebEmailAddress"
-        android:textSize="15dp" /-->
-
     <TextView
         android:id="@+id/pT"
         android:layout_width="wrap_content"
@@ -70,11 +60,34 @@
         android:inputType="textPassword"
         android:textSize="15dp" />
 
+    <TextView
+        android:id="@+id/regNew"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/pw"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="5dp"
+        android:text="@string/regNew_hyperlink"
+        android:textAllCaps="false"
+        android:textColor="#0000BB"
+        android:textSize="12dp" />
+
+    <TextView
+        android:id="@+id/forgotPw"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/regNew"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="5dp"
+        android:text="@string/forPw_hyperlink"
+        android:textColor="#0000BB"
+        android:textSize="12dp" />
+
     <Button
         android:id="@+id/sign_in"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/pw"
+        android:layout_below="@+id/forgotPw"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="15dp"
         android:onClick="signIn"

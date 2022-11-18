@@ -17,6 +17,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 
 import static android.content.ContentValues.TAG;
@@ -72,53 +74,51 @@ public class docSchedCustomAdapter extends BaseAdapter {
             Date d = new Date(item.timestamp * 1000L);
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH mm");
             String ddmmyyyyhhmmTime = sdf.format(d);
-            String[] times = ddmmyyyyhhmmTime.split(" ",2);
+            String[] times = ddmmyyyyhhmmTime.split(" ", 2);
             final String outputddmmyyyyhhmmTime = times[0] + "\n" + times[1];
 
-            final String dbUserRef = item.patientEmail.substring(0, item.patientEmail.indexOf(".com")).toLowerCase();
+            final String dbUserRef = item.patientEmail.contains(".com")?item.patientEmail.substring(0, item.patientEmail.indexOf(".com")).toLowerCase():item.patientEmail;
 
             patInfoRef.child(dbUserRef).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    String outputRecs = "";
+                    String latestCondition = "";
                     try {
-                        ArrayList<patientRecord> recs = new ArrayList<>();
-                        if(dataSnapshot.child("records").getValue() != null)
-                        {
-                            Log.d(TAG, "dataSnapshot: "+dataSnapshot.child("records").getValue());
-                            Log.d(TAG, "childrenCount: "+dataSnapshot.child("records").getChildrenCount());
+                        if (dataSnapshot.child("records").getValue() != null) {
+                            ArrayList<patientCondition> allRec = new ArrayList<>();
                             for(DataSnapshot snapshotItem : dataSnapshot.child("records").getChildren()) {
-                                Log.d(TAG, "Indiv snapshotItem: "+snapshotItem.child("records").getValue());
-                                ArrayList<String> co = snapshotItem.getValue(patientRecord.class).condition;
-                                ArrayList<String> pr = snapshotItem.getValue(patientRecord.class).prescription;
-                                long t = snapshotItem.getValue(patientRecord.class).timestamp;
-                                patientRecord p = new patientRecord(co,t,pr);
-                                Log.d(TAG, "Indiv patientRecord: "+p);
-                                recs.add(p);
+                                patientCondition pc = new patientCondition();
+                                pc.condition = snapshotItem.getKey();
+                                Log.d(TAG, "pc.condition: " + pc.condition);
+                                for(DataSnapshot patientRecItem : snapshotItem.getChildren()){
+                                    ArrayList<String> condUp = patientRecItem.getValue(patientRecord.class).conditionUpdate;
+                                    ArrayList<String> pre = patientRecItem.getValue(patientRecord.class).prescription;
+                                    long t = patientRecItem.getValue(patientRecord.class).timestamp;
+                                    patientRecord pr = new patientRecord(condUp,t,pre);
+                                    Log.d(TAG, "pr.conditionUpdate: "+pr.conditionUpdate);
+                                    Log.d(TAG, "pr.prescription: "+pr.prescription);
+                                    Log.d(TAG, "pr.timestamp: "+pr.timestamp);
+                                    pc.prevUpdates.add(pr);
+                                }
+                                allRec.add(pc);
                             }
-                        }
-
-                        if(recs!=null)
-                            outputRecs = recs.get(0).condition.get(0);
-                        for (int j = 1; j < recs.get(0).condition.size(); j++) {
-                            outputRecs += "\n" + recs.get(0).condition.get(j);
-                        }
-                        for (int i = 1; i < recs.size(); i++) {
-                            ArrayList<String> conditionArr = recs.get(i).condition;
-                            for (int j = 0; j < conditionArr.size(); j++) {
-                                outputRecs += "\n" + conditionArr.get(j);
-                            }
+                            Collections.sort(allRec, new Comparator<patientCondition>() {            //TODO array list
+                                public int compare(patientCondition item1, patientCondition item2) {
+                                    return Long.compare(item2.getLatestTimestamp(), item1.getLatestTimestamp());
+                                }
+                            });
+                            latestCondition = allRec.get(0).condition;
                         }
                     } catch (NullPointerException e) {
                         Log.w(TAG, "User Records Empty");
                     }
 
-                    Log.d(TAG, "dbUserRef: " + item.patientEmail);
+                    /*Log.d(TAG, "dbUserRef: " + item.patientEmail);
                     Log.d(TAG, "ddmmyyyyhhmmTime: " + outputddmmyyyyhhmmTime);
-                    Log.d(TAG, "outputRecs: " + outputRecs);
+                    Log.d(TAG, "conditionOutput: " + latestCondition);*/
                     nameTV.setText(dataSnapshot.child("name").getValue().toString());
                     timeTV.setText(outputddmmyyyyhhmmTime);
-                    conditionTV.setText(outputRecs);
+                    conditionTV.setText(latestCondition);
                 }
 
                 @Override

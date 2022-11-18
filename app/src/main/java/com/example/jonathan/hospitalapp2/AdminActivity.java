@@ -16,6 +16,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,7 +27,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -49,13 +52,10 @@ public class AdminActivity extends AppCompatActivity {
 
     ProgressDialog progressDialogDisplay;
     FirebaseAuth authenticationInstance = FirebaseAuth.getInstance();
+    final FirebaseUser u = authenticationInstance.getCurrentUser();
     GoogleSignInClient GsignInClient;
 
-    ValueEventListener adminVEL;
-    ValueEventListener docVEL;
-    ValueEventListener nurVEL;
-    ValueEventListener patVEL;
-    ValueEventListener careVEL;
+    ValueEventListener adminVEL, docVEL, nurVEL, patVEL, careVEL;
 
     ArrayList<DBAfieldItem> dbaFields;
     ArrayList<docFieldItem> docFields;
@@ -70,11 +70,156 @@ public class AdminActivity extends AppCompatActivity {
     DatabaseReference patAccRef = database.getReference().child("Patients");
     DatabaseReference careAccRef = database.getReference().child("Caretakers");
 
+    private static Integer[] imageIconDatabase = {R.drawable.baseline_email_24px,  //TODO Setup for spinner
+            R.drawable.baseline_vpn_key_24px, R.drawable.baseline_exit_to_app_24px, R.drawable.baseline_settings_20px};
+    ArrayList<Integer> spinnerList = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin);
 
+        /////////////////////////////////SPINNER UI/////////////////////////////////
+        for (int i = 0; i < imageIconDatabase.length; i++) {   //TODO Spinner Dropdown
+            spinnerList.add(imageIconDatabase[i]);
+        }
+        final Spinner spinner = findViewById(R.id.accSpinner);
+        CustomSpinnerAdapter spinAdap = new CustomSpinnerAdapter(this, R.layout.spinner_element, spinnerList);
+        spinner.setAdapter(spinAdap);
+        spinner.setSelection(3);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                switch (position) {
+                    case 1:
+                        spinner.setSelection(3);
+                        authenticationInstance.sendPasswordResetEmail(u.getEmail()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                Toast.makeText(AdminActivity.this, "Password Reset Email Sent", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                        break;
+
+                    case 0:
+                        //TODO refer to manifest: android:launchMode = "singleInstance" to ensure no repeat
+                        spinner.setSelection(3);
+                        LinearLayout alertLayout = new LinearLayout(AdminActivity.this);
+                        alertLayout.setOrientation(LinearLayout.VERTICAL);
+                        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(AdminActivity.this);
+                        final AlertDialog alert = alertBuilder.create();
+
+                        alertBuilder.setTitle("Change Email");
+
+                        TextView eTV = new TextView(AdminActivity.this);
+                        eTV.setText("New Email");
+                        alertLayout.addView(eTV);
+                        final EditText eET = new EditText(AdminActivity.this);
+                        eET.setText("");
+                        eET.setImeOptions(EditorInfo.IME_ACTION_NEXT);
+                        alertLayout.addView(eET);
+
+                        TextView pTV = new TextView(AdminActivity.this);  //TODO ensure it is user who actually changing
+                        pTV.setText("Confirm Password");
+                        alertLayout.addView(pTV);
+                        final EditText pET = new EditText(AdminActivity.this);
+                        pET.setText("");
+                        pET.setImeOptions(EditorInfo.IME_ACTION_NEXT);
+                        alertLayout.addView(pET);
+
+                        alertBuilder.setView(alertLayout);
+                        alertBuilder.setPositiveButton("Done", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,
+                                                int whichButton) {
+                                if (!eET.getText().toString().equals("")) {
+                                    if (!eET.getText().toString().equals(u.getEmail())) {
+                                        if (progressDialogDisplay == null) {
+                                            progressDialogDisplay = new ProgressDialog(AdminActivity.this);
+                                            progressDialogDisplay.setMessage("Changing to new account");
+                                            progressDialogDisplay.setIndeterminate(true);
+                                        }
+                                        AuthCredential credential = EmailAuthProvider
+                                                .getCredential(u.getEmail(), pET.getText().toString());
+                                        u.reauthenticate(credential)
+                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                        if (task.isSuccessful()) {
+                                                            database.getReference().child("Administrators").child(emailWithoutSuffix(u.getEmail())).addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                @Override
+                                                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                                                    Object allVal = dataSnapshot.getValue();
+                                                                    Log.d(TAG, "Patient Data: " + allVal);
+                                                                    Log.d(TAG, "SetValue Ref: " + database.getReference().child("Administrators").child(emailWithoutSuffix(u.getEmail())));
+                                                                    database.getReference().child("Administrators").child(emailWithoutSuffix(eET.getText().toString())).setValue(allVal).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                        @Override
+                                                                        public void onComplete(@NonNull Task<Void> task) {
+                                                                            database.getReference().child("Administrators").child(u.getEmail()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                @Override
+                                                                                public void onComplete(@NonNull Task<Void> task) {
+                                                                                    Log.d(TAG, "patAccRef set email ref: " + patAccRef.child("email"));
+                                                                                    database.getReference().child("Administrators").child(emailWithoutSuffix(eET.getText().toString())).child("email").setValue(eET.getText().toString()).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                                        @Override
+                                                                                        public void onSuccess(Void aVoid) {
+                                                                                            u.updateEmail(eET.getText().toString()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                                @Override
+                                                                                                public void onComplete(@NonNull Task<Void> task) {
+                                                                                                    if (task.isSuccessful()) {
+                                                                                                        hideLoadingView();
+                                                                                                        Toast.makeText(AdminActivity.this, "Email Updated", Toast.LENGTH_SHORT).show();
+                                                                                                        Log.d(TAG, "New Email: " + u.getEmail());
+                                                                                                        updateLowerInfo();
+                                                                                                        alert.dismiss();
+                                                                                                    } else {
+                                                                                                        Log.d(TAG, "Upon updating email: " + task.getException());
+                                                                                                    }
+                                                                                                }
+                                                                                            });
+                                                                                        }
+                                                                                    });
+                                                                                }
+                                                                            });
+                                                                        }
+                                                                    });
+                                                                }
+
+                                                                @Override
+                                                                public void onCancelled(DatabaseError databaseError) {
+
+                                                                }
+                                                            });
+                                                        } else {
+                                                            Toast.makeText(AdminActivity.this, "Incorrect Password", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    }
+                                                });
+                                    } else {
+                                        Toast.makeText(AdminActivity.this, "Email cannot be the same email", Toast.LENGTH_SHORT).show();
+                                    }
+                                } else {
+                                    Toast.makeText(AdminActivity.this, "Email cannot be blank", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+                        alertBuilder.show();
+                        break;
+
+                    case 2:
+                        spinner.setSelection(3);
+
+                        signOut(null);
+                        break;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                spinner.setSelection(3);
+            }
+        });
+
+
+        /////////////////////////////////SIGN IN INTERFACE/////////////////////////////////
         GoogleSignInOptions GsignInOpt = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
@@ -82,25 +227,7 @@ public class AdminActivity extends AppCompatActivity {
 
         GsignInClient = GoogleSignIn.getClient(this, GsignInOpt);
 
-        try {
-            final FirebaseUser u = authenticationInstance.getCurrentUser();
-            DatabaseReference userRef = dbaAccRef.child(emailWithoutSuffix(u.getEmail()));  //TODO Email as Primary Key
-            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    TextView nameLabel = findViewById(R.id.name);
-                    String firstName = dataSnapshot.child("name").getValue().toString().split(" ")[0];   //TODO Only display first name
-                    nameLabel.setText("Name: " + firstName + " (" + u.getEmail() + ")");
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    Log.e(TAG, "get failed with ", databaseError.toException());
-                }
-            });
-        } catch (Exception e) {
-            Log.w(TAG, "onCreate: ", e);
-        }
+        updateLowerInfo();
 
         /////////////////////////////////////POPUP WINDOW FOR INSTRUCTIONS/////////////////////////////////////
         final CheckBox box = new CheckBox(this);
@@ -174,7 +301,7 @@ public class AdminActivity extends AppCompatActivity {
                 for (DataSnapshot document : dbValues.getChildren()) {
                     try {
                         String ne = document.child("name").getValue().toString();
-                        long cn = Long.parseLong(document.child("contactNumber").getValue().toString());  //TODO Long.parseLong to confirm number
+                        long cn = Long.parseLong(document.child("contactNumber").getValue().toString());
                         String el = document.child("email").getValue().toString();
                         DBAfieldItem entry = new DBAfieldItem(ne, cn + "", el);
                         dbaFields.add(entry);
@@ -189,7 +316,7 @@ public class AdminActivity extends AppCompatActivity {
                     }
                 });
 
-                DBACustomAdapter adapter = new DBACustomAdapter(AdminActivity.this, R.layout.dbapatfielditemlayout, dbaFields);
+                DBACustomAdapter adapter = new DBACustomAdapter(AdminActivity.this, R.layout.dbapatnurfielditemlayout, dbaFields);
                 final ListView lv = findViewById(R.id.adminList);
                 lv.setAdapter(adapter);
                 lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -294,7 +421,7 @@ public class AdminActivity extends AppCompatActivity {
                 for (DataSnapshot document : dbValues.getChildren()) {
                     try {
                         String ne = document.child("name").getValue().toString();
-                        long cn = Long.parseLong(document.child("contactNumber").getValue().toString());  //TODO Integer.parseInt to confirm integer
+                        long cn = Long.parseLong(document.child("contactNumber").getValue().toString());
                         String el = document.child("email").getValue().toString();
                         Log.d(TAG, "Special: " + document.child("specialisation").getValue());
                         ArrayList<String> sp = (ArrayList<String>) document.child("specialisation").getValue();
@@ -333,7 +460,6 @@ public class AdminActivity extends AppCompatActivity {
                                     Log.d(TAG, "Specialisation: " + specialArr.get(0));
                                     specialisationField = specialArr.get(0);
                                     for (int i = 1; i < specialArr.size(); i++) {
-
                                         specialisationField += "\n" + specialArr.get(i);
                                     }
 
@@ -379,8 +505,14 @@ public class AdminActivity extends AppCompatActivity {
                                             ArrayList<Long> sched = new ArrayList<>();
                                             try {
                                                 sched = (ArrayList<Long>) dbValues.child("schedule").getValue();
-                                             }catch (NullPointerException e) {
+                                            } catch (NullPointerException e) {
                                                 Log.d(TAG, "Empty Schedule");
+                                            }
+                                            ArrayList<String> pastPat = new ArrayList<>();
+                                            try {
+                                                pastPat = (ArrayList<String>) dbValues.child("pastPatients").getValue();
+                                            } catch (NullPointerException e) {
+                                                Log.d(TAG, "Empty Past");
                                             }
                                             ArrayList<String> inputStringSp = new ArrayList<String>(Arrays.asList(specialInput.getText().toString().split("\n")));
 
@@ -390,6 +522,7 @@ public class AdminActivity extends AppCompatActivity {
                                             docUser.put("email", docItemInfo.email);
                                             docUser.put("specialisation", inputStringSp);
                                             docUser.put("schedule", sched);
+                                            docUser.put("pastPatients", pastPat);
 
                                             docAccRef.child(emailSearch)
                                                     .setValue(docUser)
@@ -446,9 +579,7 @@ public class AdminActivity extends AppCompatActivity {
                         String ne = document.child("name").getValue().toString();
                         long cn = Long.parseLong(document.child("contactNumber").getValue().toString());  //TODO Integer.parseInt to confirm integer
                         String el = document.child("email").getValue().toString();
-                        ArrayList<Integer> lvl = (ArrayList<Integer>) document.child("level").getValue();
-                        Collections.sort(lvl); //TODO sorted to get ascending orders
-                        nurFieldItem entry = new nurFieldItem(ne, cn + "", el, lvl);
+                        nurFieldItem entry = new nurFieldItem(ne, cn + "", el);
                         nurFields.add(entry);
                     } catch (Exception error) {
                         Log.w(TAG, "Error occured while retrieving:", error);
@@ -461,7 +592,7 @@ public class AdminActivity extends AppCompatActivity {
                     }
                 });
 
-                nurCustomAdapter adapter = new nurCustomAdapter(AdminActivity.this, R.layout.nurfielditemlayout, nurFields);
+                nurCustomAdapter adapter = new nurCustomAdapter(AdminActivity.this, R.layout.dbapatnurfielditemlayout, nurFields);
                 final ListView lv = findViewById(R.id.nurseList);
                 lv.setAdapter(adapter);
                 lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -474,18 +605,9 @@ public class AdminActivity extends AppCompatActivity {
                             public void onDataChange(final DataSnapshot dbValues) {
                                 String nameField;
                                 String phoneNumberField;
-                                ArrayList<Integer> lvlArr;
-                                String lvlField;
                                 try {
                                     nameField = dbValues.child("name").getValue().toString();
                                     phoneNumberField = dbValues.child("contactNumber").getValue().toString();
-                                    lvlArr = (ArrayList<Integer>) dbValues.child("level").getValue();
-                                    //TODO sorted to get ascending orders
-                                    Collections.sort(lvlArr);
-                                    lvlField = lvlArr.get(0) + "";
-                                    for (int i = 1; i < lvlArr.size(); i++) {
-                                        lvlField += "," + lvlArr.get(i);
-                                    }
 
                                     LinearLayout alertLayout = new LinearLayout(AdminActivity.this);
                                     alertLayout.setOrientation(LinearLayout.VERTICAL);
@@ -508,13 +630,6 @@ public class AdminActivity extends AppCompatActivity {
                                     contactInput.setText(phoneNumberField);
                                     alertLayout.addView(contactInput);
 
-                                    TextView specialTV = new TextView(AdminActivity.this);
-                                    specialTV.setText("Level Allocated (Split by ,):");
-                                    alertLayout.addView(specialTV);
-                                    final EditText lvlInput = new EditText(AdminActivity.this);
-                                    lvlInput.setText(lvlField);
-                                    alertLayout.addView(lvlInput);
-
                                     TextView emailpwTV = new TextView(AdminActivity.this);
                                     emailpwTV.setText("Email and password can only reset by user");
                                     alertLayout.addView(emailpwTV);
@@ -526,24 +641,14 @@ public class AdminActivity extends AppCompatActivity {
                                             ArrayList<Long> sched = new ArrayList<>();
                                             try {
                                                 sched = (ArrayList<Long>) dbValues.child("schedule").getValue();
-                                            }catch (NullPointerException e) {
+                                            } catch (NullPointerException e) {
                                                 Log.d(TAG, "Empty Schedule");
-                                            }
-                                            ArrayList<String> inputStringArrLvl = new ArrayList<String>(Arrays.asList(lvlInput.getText().toString().split(",")));
-                                            ArrayList<Integer> inputIntArrLvl = new ArrayList<>();
-                                            for (String value : inputStringArrLvl) {
-                                                try {
-                                                    inputIntArrLvl.add(Integer.parseInt(value));
-                                                } catch (NumberFormatException nfe) {
-                                                    Log.w("NumberFormat", "Parsing failed! " + value + " can not be an integer");
-                                                }
                                             }
 
                                             Map<String, Object> nurUser = new HashMap<>();
                                             nurUser.put("name", nameInput.getText().toString());
                                             nurUser.put("contactNumber", contactInput.getText().toString());
                                             nurUser.put("email", nurItemInfo.email);
-                                            nurUser.put("level", inputIntArrLvl);
                                             nurUser.put("schedule", sched);
 
                                             nurAccRef.child(emailSearch)
@@ -615,7 +720,7 @@ public class AdminActivity extends AppCompatActivity {
                     }
                 });
 
-                patCustomAdapter adapter = new patCustomAdapter(AdminActivity.this, R.layout.dbapatfielditemlayout, patFields);
+                patCustomAdapter adapter = new patCustomAdapter(AdminActivity.this, R.layout.dbapatnurfielditemlayout, patFields);
                 final ListView lv = findViewById(R.id.patientList);
                 lv.setAdapter(adapter);
                 lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -673,23 +778,16 @@ public class AdminActivity extends AppCompatActivity {
 
                                     alertBuilder.setPositiveButton("Update", new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int whichButton) {
-                                            ArrayList<patientRecord> rec = new ArrayList<>();
-                                            ArrayList<String> pres = new ArrayList<>();
-                                            ArrayList<Long> appts = new ArrayList<>();
-                                            try{
-                                                rec = (ArrayList<patientRecord>) dbValues.child("records").getValue();
-                                            }catch (NullPointerException e){
+                                            Object rec = "", appts = "";
+                                            try {
+                                                rec = dbValues.child("records").getValue();
+                                            } catch (NullPointerException e) {
                                                 Log.w(TAG, "Patient Record Null");
                                             }
-                                            try{
-                                                appts = (ArrayList<Long>) dbValues.child("appointments").getValue();
-                                            }catch (NullPointerException e){
+                                            try {
+                                                appts = dbValues.child("appointments").getValue();
+                                            } catch (NullPointerException e) {
                                                 Log.w(TAG, "Patient Appt Null");
-                                            }
-                                            try{
-                                                pres = (ArrayList<String>) dbValues.child("prescriptions").getValue();
-                                            }catch (NullPointerException e){
-                                                Log.w(TAG, "Patient Prescription Null");
                                             }
                                             long ls = (long) dbValues.child("lastSeen").getValue();
 
@@ -698,9 +796,8 @@ public class AdminActivity extends AppCompatActivity {
                                             patUser.put("contactNumber", contactInput.getText().toString());
                                             patUser.put("email", patItemInfo.email);
                                             patUser.put("address", addInput.getText().toString());
-                                            patUser.put("appointments",appts);
+                                            patUser.put("appointments", appts);
                                             patUser.put("records", rec);
-                                            patUser.put("prescriptions",pres);
                                             patUser.put("lastSeen", ls);
 
                                             patAccRef.child(emailSearch)
@@ -779,6 +876,9 @@ public class AdminActivity extends AppCompatActivity {
                     public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
                         Object itemInfo = lv.getItemAtPosition(position);
                         final careFieldItem careItemInfo = (careFieldItem) itemInfo;
+                        Log.d(TAG, "caretaker careItemInfo.email: " + careItemInfo.email);
+                        Log.d(TAG, "caretaker careItemInfo.name: " + careItemInfo.name);
+                        Log.d(TAG, "caretaker careItemInfo.patientEmail: " + careItemInfo.patientEmail);
                         final String emailSearch = emailWithoutSuffix(careItemInfo.email);
                         careAccRef.child(emailSearch).addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
@@ -845,7 +945,7 @@ public class AdminActivity extends AppCompatActivity {
                                             careUser.put("email", patientEmailField);
                                             careUser.put("address", addInput.getText().toString());
                                             careUser.put("patientEmail", peInput.getText().toString());
-                                            careUser.put("lastSeen",ls);
+                                            careUser.put("lastSeen", ls);
 
                                             careAccRef.child(emailSearch)
                                                     .setValue(careUser)
@@ -1416,7 +1516,7 @@ public class AdminActivity extends AppCompatActivity {
         alertBuilder.setPositiveButton("Register", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 showRegisteringLoading();
-                if (pwInput.getText().toString().equals(pwInput2.getText().toString())) {
+                if (pwInput.getText().toString().equals(pwInput2.getText().toString())) {  //TODO data verification
                     try {
 
                         authenticationInstance.createUserWithEmailAndPassword(emailInput.getText().toString(), pwInput.getText().toString())
@@ -1429,7 +1529,7 @@ public class AdminActivity extends AppCompatActivity {
                                             careUser.put("contactNumber", Integer.parseInt(contactInput.getText().toString()));
                                             careUser.put("email", emailInput.getText().toString());
                                             careUser.put("address", addInput.getText().toString());
-                                            careUser.put("patientEmail", peInput.getText().toString());
+                                            careUser.put("patientEmail", peInput.getText().toString());   //TODO VALIDATE PATIENT EMAIL
                                             careUser.put("lastSeen", ServerValue.TIMESTAMP); //TODO writing last seen for functions
 
                                             careAccRef.child(emailWithoutSuffix(emailInput.getText().toString()))
@@ -1479,13 +1579,41 @@ public class AdminActivity extends AppCompatActivity {
         alertBuilder.show();
     }
 
-    @Override
-    protected void onDestroy(){
-        super.onDestroy();
+    void updateLowerInfo() {
+        try {
+            final FirebaseUser fU = authenticationInstance.getCurrentUser();
+            Log.d(TAG, "Updating User Info:" + emailWithoutSuffix(fU.getEmail()));
+            dbaAccRef = database.getReference().child("Administrators");
+            dbaAccRef.child(emailWithoutSuffix(fU.getEmail())).child("name").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    TextView nameLabel = findViewById(R.id.name);
+                    TextView emailLabel = findViewById(R.id.email);
+                    if (dataSnapshot.getValue() != null) {
+                        String firstName = dataSnapshot.getValue().toString().split(" ")[0];   //TODO Only display first name
+                        nameLabel.setText("Name: " + firstName);
+                    }
+                    Log.d(TAG, "Datasnapshot of name: " + dataSnapshot.getValue());
+                    emailLabel.setText("Email: " + fU.getEmail());
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.e(TAG, "get failed with ", databaseError.toException());
+                }
+            });
+        } catch (Exception e) {
+            Log.d(TAG, "updateLowerInfo: ", e);
+        }
+    }
+
+    @Override  //TODO remove all listeners so as not to hog CPU
+    protected void onDestroy() {
         dbaAccRef.removeEventListener(adminVEL);
         docAccRef.removeEventListener(docVEL);
         nurAccRef.removeEventListener(nurVEL);
         patAccRef.removeEventListener(patVEL);
         careAccRef.removeEventListener(careVEL);
+        super.onDestroy();
     }
 }

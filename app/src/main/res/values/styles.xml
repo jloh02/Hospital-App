@@ -18,4 +18,8 @@
         <item name="backgroundTint">@color/colorAccent</item>
     </style>
 
+    <!--style name="Widget.AppCompat.Spinner.overlappedAnchor">
+        <item name="overlapAnchor">false</item>
+        <item name="background">@drawable/baseline_settings_20px</item>
+    </style-->
 </resources>

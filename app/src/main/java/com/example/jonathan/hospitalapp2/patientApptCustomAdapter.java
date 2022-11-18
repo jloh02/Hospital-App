@@ -9,17 +9,20 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
-import static android.content.ContentValues.TAG;
 
-public class patCustomAdapter extends BaseAdapter {
+public class patientApptCustomAdapter extends BaseAdapter {
     private Activity activity;
-    ArrayList<patFieldItem> data;
+    ArrayList<scheduleItem> data;
     Context context;
     private static LayoutInflater inflater = null;
 
-    public patCustomAdapter (Activity activity, int textViewResourceId, ArrayList<patFieldItem> dataItems) {
+    String TAG = "patientApptCustomAdapter";
+
+    public patientApptCustomAdapter(Activity activity, ArrayList<scheduleItem> dataItems) {
         try {
             this.activity = activity;
             this.data = dataItems;
@@ -32,17 +35,17 @@ public class patCustomAdapter extends BaseAdapter {
     }
 
     @Override
-    public int getCount(){
+    public int getCount() {
         return data.size();
     }
 
     @Override
-    public Object getItem(int position){
+    public Object getItem(int position) {
         return data.get(position);
     }
 
     @Override
-    public long getItemId(int position){
+    public long getItemId(int position) {
         return position;
     }
 
@@ -51,20 +54,22 @@ public class patCustomAdapter extends BaseAdapter {
         View view = convertView;
         try {
             if (convertView == null) {
-                view = inflater.inflate(R.layout.dbapatnurfielditemlayout, null);
+                view = inflater.inflate(R.layout.pat_appt_custom_adapter_layout, null);
             }
-            TextView nameTV = (TextView) view.findViewById(R.id.nameTV);
-            TextView contactTV = (TextView) view.findViewById(R.id.cnTV);
-            TextView emailTV = (TextView) view.findViewById(R.id.eTV);
+            final TextView timeTV = (TextView) view.findViewById(R.id.timeTV);
+            final TextView locationTV = (TextView) view.findViewById(R.id.locTV);
 
-            patFieldItem item = data.get(position);
+            final scheduleItem item = data.get(position);
 
-            nameTV.setText(item.name);
-            contactTV.setText(item.contactNumber);
-            emailTV.setText(item.email);
+            Date d = new Date(item.timestamp * 1000L);
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+            String ddmmyyyyhhmmTime = sdf.format(d);
+
+            timeTV.setText(ddmmyyyyhhmmTime);
+            locationTV.setText("Location: \n" + item.location);
 
         } catch (Exception e) {
-            Log.e(TAG, "Error: ",e );
+            Log.e(TAG, "Error: ", e);
         }
         return view;
     }

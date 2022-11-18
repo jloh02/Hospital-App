@@ -13,16 +13,23 @@ import java.util.ArrayList;
 
 import static android.content.ContentValues.TAG;
 
-public class patCustomAdapter extends BaseAdapter {
+/**
+ * Created by Jonathan on 6/7/2018.
+ */
+
+public class docPastPatListAdapter extends BaseAdapter {
     private Activity activity;
-    ArrayList<patFieldItem> data;
+    ArrayList<String> namesData;
+    ArrayList<String> conditionData;
     Context context;
     private static LayoutInflater inflater = null;
 
-    public patCustomAdapter (Activity activity, int textViewResourceId, ArrayList<patFieldItem> dataItems) {
+    public docPastPatListAdapter(Activity activity, int textViewResourceId, ArrayList<String> nD,
+            ArrayList<String> cD) {
         try {
             this.activity = activity;
-            this.data = dataItems;
+            this.namesData = nD;
+            this.conditionData = cD;
 
             inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -32,17 +39,17 @@ public class patCustomAdapter extends BaseAdapter {
     }
 
     @Override
-    public int getCount(){
-        return data.size();
+    public int getCount() {
+        return namesData.size();
     }
 
     @Override
-    public Object getItem(int position){
-        return data.get(position);
+    public Object getItem(int position) {
+        return namesData.get(position);
     }
 
     @Override
-    public long getItemId(int position){
+    public long getItemId(int position) {
         return position;
     }
 
@@ -51,21 +58,21 @@ public class patCustomAdapter extends BaseAdapter {
         View view = convertView;
         try {
             if (convertView == null) {
-                view = inflater.inflate(R.layout.dbapatnurfielditemlayout, null);
+                view = inflater.inflate(R.layout.docpastpatlistlayout, null);
             }
             TextView nameTV = (TextView) view.findViewById(R.id.nameTV);
-            TextView contactTV = (TextView) view.findViewById(R.id.cnTV);
-            TextView emailTV = (TextView) view.findViewById(R.id.eTV);
+            TextView condTV = (TextView) view.findViewById(R.id.cTV);
 
-            patFieldItem item = data.get(position);
+            String nameOut = namesData.get(position);
+            String condOut = conditionData.get(position);
 
-            nameTV.setText(item.name);
-            contactTV.setText(item.contactNumber);
-            emailTV.setText(item.email);
+            nameTV.setText(nameOut);
+            condTV.setText(condOut);
 
         } catch (Exception e) {
-            Log.e(TAG, "Error: ",e );
+            Log.e(TAG, "Error: ", e);
         }
         return view;
     }
 }
+

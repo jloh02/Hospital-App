@@ -19,7 +19,7 @@ public class nurCustomAdapter extends BaseAdapter {
     Context context;
     private static LayoutInflater inflater = null;
 
-    public nurCustomAdapter (Activity activity, int textViewResourceId, ArrayList<nurFieldItem> dataItems) {
+    public nurCustomAdapter(Activity activity, int textViewResourceId, ArrayList<nurFieldItem> dataItems) {
         try {
             this.activity = activity;
             this.data = dataItems;
@@ -32,17 +32,17 @@ public class nurCustomAdapter extends BaseAdapter {
     }
 
     @Override
-    public int getCount(){
+    public int getCount() {
         return data.size();
     }
 
     @Override
-    public Object getItem(int position){
+    public Object getItem(int position) {
         return data.get(position);
     }
 
     @Override
-    public long getItemId(int position){
+    public long getItemId(int position) {
         return position;
     }
 
@@ -51,25 +51,20 @@ public class nurCustomAdapter extends BaseAdapter {
         View view = convertView;
         try {
             if (convertView == null) {
-                view = inflater.inflate(R.layout.nurfielditemlayout, null);
+                view = inflater.inflate(R.layout.dbapatnurfielditemlayout, null);
             }
-            TextView nameTV = (TextView) view.findViewById(R.id.nameTV);
-            TextView lvlTV = (TextView) view.findViewById(R.id.levelTV);
-            TextView emailTV = (TextView) view.findViewById(R.id.eTV);
+            TextView nameTV = view.findViewById(R.id.nameTV);
+            TextView cnTV = view.findViewById(R.id.cnTV);
+            TextView emailTV = view.findViewById(R.id.eTV);
 
             nurFieldItem item = data.get(position);
 
-            String outputLvl =  item.level.get(0) +"";
-            for(int i=1;i<item.level.size();i++){
-                outputLvl += "," + item.level.get(i);
-            }
-
             nameTV.setText(item.name);
-            lvlTV.setText(outputLvl);
+            cnTV.setText(item.contactNumber);
             emailTV.setText(item.email);
 
         } catch (Exception e) {
-            Log.e(TAG, "Error: ",e );
+            Log.e(TAG, "Error: ", e);
         }
         return view;
     }

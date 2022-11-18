@@ -51,7 +51,7 @@ public class DBACustomAdapter extends BaseAdapter {
         View view = convertView;
         try {
             if (convertView == null) {
-                view = inflater.inflate(R.layout.dbapatfielditemlayout, null);
+                view = inflater.inflate(R.layout.dbapatnurfielditemlayout, null);
             }
             TextView nameTV = (TextView) view.findViewById(R.id.nameTV);
             TextView contactTV = (TextView) view.findViewById(R.id.cnTV);

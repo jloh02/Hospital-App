@@ -7,13 +7,13 @@ import java.util.ArrayList;
  */
 
 public class patientRecord {
-    ArrayList<String> condition;
+    ArrayList<String> conditionUpdate;
     long timestamp;
     ArrayList<String> prescription;
 
     public patientRecord(){}
     public patientRecord(ArrayList<String> c, long t, ArrayList<String> p){
-        this.condition = c;
+        this.conditionUpdate = c;
         this.timestamp = t;
         this.prescription = p;
     }

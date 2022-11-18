@@ -3,7 +3,7 @@
     package="com.example.jonathan.hospitalapp2">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -11,8 +11,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-
+        android:theme="@style/AppTheme.NoActionBar">
         <activity
             android:name=".loginActivity"
             android:screenOrientation="portrait"
@@ -31,9 +30,17 @@
             android:name=".DoctorActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".addApptActivity"
+        <activity
+            android:name=".addApptActivity"
             android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".PatientActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:launchMode = "singleInstance"
+            />
+        <activity android:name=".docPastPatActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
+        <receiver android:name="com.example.jonathan.hospitalapp2.AlarmReceiver"/>
     </application>
 
 </manifest>

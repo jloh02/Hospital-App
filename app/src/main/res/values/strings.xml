@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">Hospital Helper</string>
+    <string name="app_name">HAS</string>
+    <string name="regNew_hyperlink"><u>Register New Account</u></string>
+    <string name="forPw_hyperlink"><u>Forgot Password</u></string>
 </resources>

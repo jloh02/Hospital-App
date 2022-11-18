@@ -1,28 +1,34 @@
 package com.example.jonathan.hospitalapp2;
 
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Map;
+
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
-
-import java.util.ArrayList;
 
 import static android.content.ContentValues.TAG;
 
-public class patCustomAdapter extends BaseAdapter {
+class CustomSpinnerAdapter extends BaseAdapter {
     private Activity activity;
-    ArrayList<patFieldItem> data;
+    ArrayList<Integer> data;
     Context context;
     private static LayoutInflater inflater = null;
 
-    public patCustomAdapter (Activity activity, int textViewResourceId, ArrayList<patFieldItem> dataItems) {
+    public CustomSpinnerAdapter (Activity activity, int textViewResourceId, ArrayList<Integer> imageIDs) {
         try {
             this.activity = activity;
-            this.data = dataItems;
+            this.data = imageIDs;
 
             inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -51,17 +57,11 @@ public class patCustomAdapter extends BaseAdapter {
         View view = convertView;
         try {
             if (convertView == null) {
-                view = inflater.inflate(R.layout.dbapatnurfielditemlayout, null);
+                view = inflater.inflate(R.layout.spinner_element, null);
             }
-            TextView nameTV = (TextView) view.findViewById(R.id.nameTV);
-            TextView contactTV = (TextView) view.findViewById(R.id.cnTV);
-            TextView emailTV = (TextView) view.findViewById(R.id.eTV);
-
-            patFieldItem item = data.get(position);
-
-            nameTV.setText(item.name);
-            contactTV.setText(item.contactNumber);
-            emailTV.setText(item.email);
+            ImageView imv = view.findViewById(R.id.spinnerImage);
+            Integer item = data.get(position);
+            imv.setBackgroundResource(item);
 
         } catch (Exception e) {
             Log.e(TAG, "Error: ",e );

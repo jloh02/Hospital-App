@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.jonathan.hospitalapp2.docPastPatActivity">
+
+    <RelativeLayout
+        android:id="@+id/headers"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentTop="true"
+        android:background="#000000">
+
+        <TextView
+            android:id="@+id/patientNameLabel"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="15dp"
+            android:backgroundTint="#000000"
+            android:textAlignment="center"
+            android:text="Name"
+            android:textSize="17sp"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/conditionLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="15dp"
+            android:layout_toEndOf="@+id/patientNameLabel"
+            android:layout_toRightOf="@+id/patientNameLabel"
+            android:backgroundTint="#000000"
+            android:textAlignment="center"
+            android:text="Condition / Surgery"
+            android:textSize="17sp"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+
+    <ListView
+        android:id="@+id/docPastPatList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/headers"
+        android:layout_above="@+id/closeWindowButton"
+        android:minHeight="40dp"/>
+
+    <Button
+        android:id="@+id/closeWindowButton"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:text="Done"
+        android:onClick="closeWindow"/>
+
+</RelativeLayout>
